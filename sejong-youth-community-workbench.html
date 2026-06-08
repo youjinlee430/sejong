@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>세종 청년 커뮤니티 정량 데이터 워크벤치</title>
+  <style>
+    :root {
+      --teal: #08796f;
+      --teal-dark: #045f59;
+      --ink: #172023;
+      --muted: #667176;
+      --line: #d9dfdc;
+      --bg: #f4f7f5;
+      --panel: #ffffff;
+      --soft: #edf4f1;
+      --warm: #b85a3c;
+      --blue: #355f84;
+      --yellow: #ffe8a3;
+      --shadow: 0 18px 42px rgba(31, 45, 43, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(8, 121, 111, 0.05), transparent 34%),
+        var(--bg);
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 13px;
+      cursor: pointer;
+      min-height: 38px;
+    }
+
+    button:hover { border-color: var(--teal); }
+
+    .primary {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .danger {
+      color: #9f3c2d;
+      border-color: #edd5cd;
+      background: #fff8f6;
+    }
+
+    .topbar {
+      min-height: 82px;
+      padding: 17px clamp(16px, 4vw, 48px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 3.2vw, 38px);
+      line-height: 1.12;
+      font-weight: 900;
+    }
+
+    h2 {
+      margin: 0 0 9px;
+      font-size: clamp(22px, 2.3vw, 30px);
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 176px minmax(0, 1fr);
+      gap: 18px;
+      max-width: 1120px;
+      margin: 20px auto;
+      padding: 0 18px 42px;
+    }
+
+    nav {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px;
+      align-self: start;
+      position: sticky;
+      top: 14px;
+    }
+
+    .tab {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: #475158;
+      font-weight: 700;
+      margin: 2px 0;
+    }
+
+    .tab.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    main {
+      min-width: 0;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 2.8vw, 28px);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .section-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 256px;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e4f3ef;
+      color: var(--teal-dark);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .source-title {
+      margin: 2px 0 8px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .source-desc {
+      min-height: 66px;
+      margin: 0 0 14px;
+      color: #566067;
+      line-height: 1.55;
+      font-size: 14px;
+      word-break: keep-all;
+    }
+
+    .source-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #2f3a3f;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--ink);
+      min-height: 38px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: 1 / -1; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      background: #f3f6f4;
+      font-size: 12px;
+      color: #2e393f;
+    }
+
+    .table-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: auto;
+      background: #fff;
+      max-height: 330px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #eaf1f7;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 15px;
+      background: #fff;
+    }
+
+    .metric b {
+      display: block;
+      color: var(--warm);
+      font-size: 29px;
+      line-height: 1.1;
+      margin: 6px 0;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .indicator-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.85fr 0.85fr 0.6fr 1fr 44px;
+      min-width: 820px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .indicator-grid > div {
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .indicator-grid .head {
+      background: #f3f6f4;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .indicator-grid input {
+      min-width: 0;
+      padding: 8px;
+    }
+
+    .note {
+      background: #fffdf6;
+      border: 1px solid #eadca9;
+      border-radius: 6px;
+      padding: 12px 14px;
+      color: #5b4b18;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .brief {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 16px;
+      white-space: pre-wrap;
+      line-height: 1.62;
+      min-height: 250px;
+      word-break: keep-all;
+    }
+
+    .extract-panel {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: 14px;
+    }
+
+    .result-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #334047;
+      line-height: 1.75;
+      font-size: 14px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 860px) {
+      .topbar { align-items: stretch; flex-direction: column; }
+      .actions { justify-content: flex-start; }
+      .wrap { grid-template-columns: 1fr; padding-inline: 12px; }
+      nav {
+        position: static;
+        display: flex;
+        overflow: auto;
+      }
+      .tab {
+        width: auto;
+        white-space: nowrap;
+      }
+      main { padding: 18px; }
+      .grid, .metrics, .form, .two, .extract-panel { grid-template-columns: 1fr; }
+      .span-2, .span-3 { grid-column: auto; }
+      .section-head { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">SEJONG YOUTH COMMUNITY POLICY DESIGN</p>
+      <h1>세종 청년 커뮤니티 정량 데이터 워크벤치</h1>
+    </div>
+    <div class="actions">
+      <button id="importBtn">JSON 불러오기</button>
+      <button id="jsonBtn">JSON</button>
+      <button id="csvBtn" class="primary">CSV</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden />
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav aria-label="작업 단계">
+      <button class="tab active" data-view="sources">공공데이터</button>
+      <button class="tab" data-view="reviews">후기/커뮤니티</button>
+      <button class="tab" data-view="compare">비교도시</button>
+      <button class="tab" data-view="indicators">정량 정리</button>
+      <button class="tab" data-view="analysis">문제 분석</button>
+    </nav>
+
+    <main>
+      <section id="sources" class="view active">
+        <div class="section-head">
+          <div>
+            <h2>공공데이터 링크 접근</h2>
+            <p class="lead">청년 인구, 1인가구, 사회참여, 고용, 정신건강, 프로그램 공급 데이터를 빠르게 확인합니다.</p>
+          </div>
+          <input id="sourceSearch" placeholder="출처 또는 키워드 검색" />
+        </div>
+        <div id="sourceCards" class="grid"></div>
+      </section>
+
+      <section id="reviews" class="view">
+        <div class="section-head">
+          <div>
+            <h2>후기/커뮤니티 증거 수집</h2>
+            <p class="lead">공공기관 웹사이트, 지도 후기, 블로그, 커뮤니티에서 발견한 반복 표현을 기록하고 빈도와 감성을 정리합니다.</p>
+          </div>
+          <button id="clearReviews">후기 초기화</button>
+        </div>
+        <div class="card">
+          <div class="form">
+            <label>채널
+              <select id="reviewChannel">
+                <option>공공기관 웹사이트</option>
+                <option>세종청년센터</option>
+                <option>네이버 지도/블로그</option>
+                <option>지역 커뮤니티</option>
+                <option>뉴스/보도자료</option>
+                <option>설문/인터뷰</option>
+              </select>
+            </label>
+            <label>장소/문제상황
+              <input id="reviewPlace" placeholder="예: 조치원 청년공간, 온라인 모임" />
+            </label>
+            <label>감성
+              <select id="reviewSentiment">
+                <option>부정</option>
+                <option>중립</option>
+                <option>긍정</option>
+              </select>
+            </label>
+            <label class="span-2">핵심 표현
+              <input id="reviewText" placeholder="예: 같이 갈 사람이 없다, 정보가 흩어져 있다, 참여가 어색하다" />
+            </label>
+            <label>빈도
+              <input id="reviewCount" type="number" min="1" value="1" />
+            </label>
+            <label class="span-2">URL
+              <input id="reviewUrl" placeholder="https://" />
+            </label>
+            <button id="addReview" class="primary">기록 추가</button>
+          </div>
+        </div>
+        <div class="two">
+          <div class="table-box">
+            <table>
+              <thead><tr><th>채널</th><th>장소/상황</th><th>감성</th><th>표현</th><th>빈도</th><th></th></tr></thead>
+              <tbody id="reviewRows"></tbody>
+            </table>
+          </div>
+          <aside class="card">
+            <h3>후기 키워드</h3>
+            <div id="keywordChips" class="chips"></div>
+          </aside>
+        </div>
+        <div class="extract-panel">
+          <div class="card">
+            <h3>붙여넣기 텍스트 추출</h3>
+            <textarea id="rawText" placeholder="기사, 공지, 후기, 설문 응답을 붙여넣으면 숫자와 반복 키워드를 추출합니다."></textarea>
+            <div class="actions" style="justify-content:flex-start; margin-top:10px;">
+              <button id="extractBtn" class="primary">추출 실행</button>
+              <button id="useExtractBtn">후기 기록에 반영</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>추출 결과</h3>
+            <ul id="extractResults" class="result-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="compare" class="view">
+        <div class="section-head">
+          <div>
+            <h2>비교도시 벤치마크</h2>
+            <p class="lead">대전, 청주, 천안, 서울 자치구 등과 프로그램 공급량, 청년 밀도, 온라인 언급량을 비교합니다.</p>
+          </div>
+          <button id="addCity">도시 추가</button>
+        </div>
+        <div class="table-box">
+          <table>
+            <thead><tr><th>도시</th><th>비교 이유</th><th>청년 인구</th><th>커뮤니티/공간 수</th><th>청년 고립 관련 언급</th><th>메모</th><th></th></tr></thead>
+            <tbody id="cityRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="indicators" class="view">
+        <div class="section-head">
+          <div>
+            <h2>정량 데이터 정리</h2>
+            <p class="lead">워크숍에서 합의한 지표를 입력하면 결핍 신호와 차이가 자동 계산됩니다.</p>
+          </div>
+          <button id="addIndicator">지표 추가</button>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <span>교류 결핍 지수</span>
+            <b id="scarcityScore">0</b>
+            <span>높을수록 문제 우선순위가 큼</span>
+          </div>
+          <div class="metric">
+            <span>부정 후기 비율</span>
+            <b id="negativeRate">0%</b>
+            <span>후기/커뮤니티 입력값 기준</span>
+          </div>
+          <div class="metric">
+            <span>비교도시 평균 대비</span>
+            <b id="gapRate">0%</b>
+            <span>정량 지표의 세종-비교 차이</span>
+          </div>
+        </div>
+        <div class="table-box">
+          <div id="indicatorGrid" class="indicator-grid"></div>
+        </div>
+      </section>
+
+      <section id="analysis" class="view">
+        <div class="section-head">
+          <div>
+            <h2>정책 문제 분석</h2>
+            <p class="lead">수집한 증거를 문제정의 문장과 정책 가설로 정리합니다.</p>
+          </div>
+          <button id="copyBrief">브리프 복사</button>
+        </div>
+        <div class="note">입력한 데이터는 서버로 전송되지 않고 브라우저에만 저장됩니다. 워크숍 종료 시 JSON/CSV로 내려받아 공유하세요.</div>
+        <div class="form">
+          <label class="span-2">정책 문제 문장
+            <textarea id="problemText"></textarea>
+          </label>
+          <label>정량 근거
+            <textarea id="evidenceText"></textarea>
+          </label>
+          <label class="span-2">원인 가설
+            <textarea id="causeText"></textarea>
+          </label>
+          <label>정책 기회
+            <textarea id="opportunityText"></textarea>
+          </label>
+        </div>
+        <div id="brief" class="brief"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const seed = {
+      reviews: [
+        { channel: "세종청년센터", place: "프로그램 공지", sentiment: "중립", text: "정보는 있으나 대상과 일정이 흩어져 있어 한눈에 보기 어렵다", count: 3, url: "" },
+        { channel: "지역 커뮤니티", place: "세종시 전반", sentiment: "부정", text: "퇴근 후 같이 갈 모임이 적고 처음 참여가 어색하다", count: 5, url: "" },
+        { channel: "뉴스/보도자료", place: "고립 청년 지원", sentiment: "부정", text: "고립 은둔 청년 실태조사와 발굴 체계가 필요하다", count: 4, url: "" }
+      ],
+      indicators: [
+        { name: "만 19-39세 청년 인구", sejong: 0, compare: 0, unit: "명", source: "KOSIS/세담터" },
+        { name: "청년 1인가구 수", sejong: 0, compare: 0, unit: "가구", source: "KOSIS" },
+        { name: "청년 커뮤니티 프로그램 수", sejong: 0, compare: 0, unit: "건", source: "세종청년센터/타 지자체" },
+        { name: "청년 공간 또는 활동 거점 수", sejong: 0, compare: 0, unit: "개", source: "공공데이터포털/지자체" },
+        { name: "고립/외로움 관련 부정 언급", sejong: 0, compare: 0, unit: "건", source: "후기/커뮤니티" }
+      ],
+      cities: [
+        { city: "대전", reason: "인접 광역 생활권", youth: 0, spaces: 0, mentions: 0, memo: "청년공간과 대학가 프로그램 비교" },
+        { city: "청주", reason: "충청권 유사 생활권", youth: 0, spaces: 0, mentions: 0, memo: "청년센터 프로그램 공급량 비교" }
+      ],
+      analysis: {
+        problem: "세종시 청년은 높은 청년 비율과 성장도시 이미지를 갖고 있지만, 일상적으로 교류할 수 있는 커뮤니티 정보와 참여 동선이 분산되어 사회적 고립 위험을 조기에 발견하기 어렵다.",
+        evidence: "",
+        cause: "행정기관, 청년공간, 민간모임, 온라인 커뮤니티의 정보가 흩어져 있고 처음 참여자를 위한 낮은 문턱의 반복 프로그램이 부족하다.",
+        opportunity: "공공데이터와 커뮤니티 후기를 결합해 고립 위험 신호를 조기에 파악하고, 권역별 소모임 추천과 첫 참여 동행 프로그램을 설계한다."
+      }
+    };
+
+    const sources = [
+      { type: "지역 데이터", title: "세담터 세종특별자치시 빅데이터 플랫폼", desc: "세종시가 관리하는 생활, 행정, 공간, 지역 현황 데이터를 확인합니다.", url: "https://www2.sejong.go.kr/bigdata/systemIntro.do" },
+      { type: "공공데이터", title: "공공데이터포털", desc: "청년시설, 문화시설, 상담, 일자리, 복지 관련 개방 데이터를 검색합니다.", url: "https://www.data.go.kr/" },
+      { type: "통계", title: "KOSIS 국가통계포털", desc: "연령별 인구, 1인가구, 고용, 사회조사, 정신건강 지표를 비교합니다.", url: "https://kosis.kr/" },
+      { type: "청년 정책", title: "온통청년", desc: "전국 청년정책과 프로그램을 검색해 세종의 공급 수준을 비교합니다.", url: "https://www.youthcenter.go.kr/" },
+      { type: "지자체", title: "세종청년센터", desc: "세종 청년 프로그램, 공간, 커뮤니티 모집 정보를 확인합니다.", url: "https://sjyouth.sjtp.or.kr/" },
+      { type: "복지/고립", title: "보건복지부", desc: "고립·은둔 청년 지원 정책, 실태조사, 사회서비스 자료를 확인합니다.", url: "https://www.mohw.go.kr/" },
+      { type: "검색", title: "네이버 후기 검색", desc: "청년센터, 모임, 공간 관련 반복 불만과 참여 장벽 표현을 모읍니다.", url: "https://search.naver.com/search.naver?query=%EC%84%B8%EC%A2%85%EC%8B%9C%20%EC%B2%AD%EB%85%84%20%EB%AA%A8%EC%9E%84%20%ED%9B%84%EA%B8%B0" },
+      { type: "검색", title: "구글 후기 검색", desc: "외부 방문자와 청년 커뮤니티 관련 장소별 평가, 리뷰량, 반복 표현을 비교합니다.", url: "https://www.google.com/search?q=%EC%84%B8%EC%A2%85%EC%8B%9C+%EC%B2%AD%EB%85%84+%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0+%ED%9B%84%EA%B8%B0" },
+      { type: "공공기관", title: "세종시 사회서비스원", desc: "고립·은둔 청년 실태조사, 복지 서비스, 지역 돌봄 자료를 점검합니다.", url: "https://www.sjwf.or.kr/" }
+    ];
+
+    const keywords = ["고립", "은둔", "외로움", "혼자", "같이", "모임", "참여", "정보", "흩어져", "부족", "어색", "퇴근", "주말", "상담", "청년센터", "1인가구", "커뮤니티", "프로그램", "관계", "친구"];
+    const cloneSeed = () => JSON.parse(JSON.stringify(seed));
+    const state = load();
+    let lastExtract = [];
+
+    function load() {
+      try {
+        return JSON.parse(localStorage.getItem("sejongYouthWorkbench")) || cloneSeed();
+      } catch {
+        return cloneSeed();
+      }
+    }
+
+    function save() {
+      localStorage.setItem("sejongYouthWorkbench", JSON.stringify(state));
+    }
+
+    function download(name, text, type) {
+      const blob = new Blob([text], { type });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function csvEscape(value) {
+      return '"' + String(value ?? "").replace(/"/g, '""') + '"';
+    }
+
+    function exportCsv() {
+      const rows = [];
+      rows.push(["section", "field1", "field2", "field3", "value", "unit", "source"].map(csvEscape).join(","));
+      state.indicators.forEach(i => rows.push(["indicator", i.name, "sejong", i.compare, i.sejong, i.unit, i.source].map(csvEscape).join(",")));
+      state.reviews.forEach(r => rows.push(["review", r.channel, r.place, r.sentiment, r.count, r.text, r.url].map(csvEscape).join(",")));
+      state.cities.forEach(c => rows.push(["compare_city", c.city, c.reason, c.youth, c.spaces, c.mentions, c.memo].map(csvEscape).join(",")));
+      download("sejong-youth-community-data.csv", "\ufeff" + rows.join("\n"), "text/csv;charset=utf-8");
+    }
+
+    function renderSources() {
+      const q = document.querySelector("#sourceSearch").value.trim().toLowerCase();
+      const box = document.querySelector("#sourceCards");
+      box.innerHTML = "";
+      sources
+        .filter(s => !q || [s.type, s.title, s.desc].join(" ").toLowerCase().includes(q))
+        .forEach(s => {
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `
+            <span class="tag">${s.type}</span>
+            <div class="source-title">${s.title}</div>
+            <p class="source-desc">${s.desc}</p>
+            <div class="source-actions">
+              <button data-open="${s.url}">열기</button>
+              <button data-memo="${s.title}">조사 메모</button>
+            </div>`;
+          box.append(card);
+        });
+    }
+
+    function renderReviews() {
+      const body = document.querySelector("#reviewRows");
+      body.innerHTML = "";
+      state.reviews.forEach((r, idx) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${r.channel}</td><td>${r.place}</td><td>${r.sentiment}</td><td>${r.text}</td><td>${r.count}</td><td><button class="danger" data-del-review="${idx}">삭제</button></td>`;
+        body.append(tr);
+      });
+
+      const counts = {};
+      state.reviews.forEach(r => {
+        keywords.forEach(k => {
+          if ((r.text + " " + r.place).includes(k)) counts[k] = (counts[k] || 0) + Number(r.count || 1);
+        });
+      });
+      const chips = document.querySelector("#keywordChips");
+      chips.innerHTML = "";
+      Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 14).forEach(([k, v]) => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = `${k} ${v}`;
+        chips.append(chip);
+      });
+    }
+
+    function renderIndicators() {
+      const grid = document.querySelector("#indicatorGrid");
+      grid.innerHTML = "";
+      ["지표", "세종 값", "비교 값", "단위", "출처", ""].forEach(h => {
+        const div = document.createElement("div");
+        div.className = "head";
+        div.textContent = h;
+        grid.append(div);
+      });
+      state.indicators.forEach((i, idx) => {
+        ["name", "sejong", "compare", "unit", "source"].forEach(key => {
+          const cell = document.createElement("div");
+          const input = document.createElement("input");
+          input.value = i[key];
+          input.type = ["sejong", "compare"].includes(key) ? "number" : "text";
+          input.addEventListener("input", () => {
+            i[key] = input.type === "number" ? Number(input.value) : input.value;
+            save();
+            renderMetrics();
+            renderAnalysis();
+          });
+          cell.append(input);
+          grid.append(cell);
+        });
+        const cell = document.createElement("div");
+        cell.innerHTML = `<button class="danger" data-del-indicator="${idx}">삭제</button>`;
+        grid.append(cell);
+      });
+      renderMetrics();
+    }
+
+    function renderCities() {
+      const body = document.querySelector("#cityRows");
+      body.innerHTML = "";
+      state.cities.forEach((c, idx) => {
+        const tr = document.createElement("tr");
+        ["city", "reason", "youth", "spaces", "mentions", "memo"].forEach(key => {
+          const td = document.createElement("td");
+          const input = document.createElement("input");
+          input.type = ["youth", "spaces", "mentions"].includes(key) ? "number" : "text";
+          input.value = c[key];
+          input.addEventListener("input", () => {
+            c[key] = input.type === "number" ? Number(input.value) : input.value;
+            save();
+          });
+          td.append(input);
+          tr.append(td);
+        });
+        const td = document.createElement("td");
+        td.innerHTML = `<button class="danger" data-del-city="${idx}">삭제</button>`;
+        tr.append(td);
+        body.append(tr);
+      });
+    }
+
+    function renderMetrics() {
+      const negative = state.reviews.filter(r => r.sentiment === "부정").reduce((s, r) => s + Number(r.count || 0), 0);
+      const total = state.reviews.reduce((s, r) => s + Number(r.count || 0), 0);
+      const negRate = total ? Math.round((negative / total) * 100) : 0;
+      const diffs = state.indicators
+        .filter(i => Number(i.compare) > 0)
+        .map(i => ((Number(i.sejong) - Number(i.compare)) / Number(i.compare)) * 100);
+      const avgGap = diffs.length ? Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length) : 0;
+      const scarcity = Math.max(0, Math.round(negRate * 0.55 + Math.abs(Math.min(avgGap, 0)) * 0.45));
+      document.querySelector("#negativeRate").textContent = `${negRate}%`;
+      document.querySelector("#gapRate").textContent = `${avgGap}%`;
+      document.querySelector("#scarcityScore").textContent = scarcity;
+    }
+
+    function renderAnalysis() {
+      document.querySelector("#problemText").value = state.analysis.problem;
+      document.querySelector("#causeText").value = state.analysis.cause;
+      document.querySelector("#opportunityText").value = state.analysis.opportunity;
+      const evidence = [
+        `부정 후기 ${state.reviews.filter(r => r.sentiment === "부정").length}개 유형, 총 빈도 ${state.reviews.reduce((s, r) => s + Number(r.count || 0), 0)}회`,
+        ...state.indicators.map(i => `${i.name}: 세종 ${i.sejong}${i.unit}, 비교 ${i.compare}${i.unit}, 출처 ${i.source}`)
+      ].join("\n");
+      state.analysis.evidence = state.analysis.evidence || evidence;
+      document.querySelector("#evidenceText").value = state.analysis.evidence;
+      const brief = `[정책 문제]\n${state.analysis.problem}\n\n[정량 근거]\n${state.analysis.evidence}\n\n[원인 가설]\n${state.analysis.cause}\n\n[정책 기회]\n${state.analysis.opportunity}`;
+      document.querySelector("#brief").textContent = brief;
+    }
+
+    function extractText() {
+      const text = document.querySelector("#rawText").value;
+      const nums = Array.from(text.matchAll(/([0-9]+(?:\.[0-9]+)?)(\s?%|\s?명|\s?건|\s?개|\s?가구|\s?회)?/g)).map(m => `${m[1]}${m[2] || ""}`);
+      const hits = keywords.map(k => [k, (text.match(new RegExp(k, "g")) || []).length]).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
+      lastExtract = hits;
+      const list = document.querySelector("#extractResults");
+      list.innerHTML = "";
+      [...nums.slice(0, 8).map(n => `숫자: ${n}`), ...hits.slice(0, 10).map(([k, n]) => `키워드: ${k} ${n}회`)].forEach(v => {
+        const li = document.createElement("li");
+        li.textContent = v;
+        list.append(li);
+      });
+    }
+
+    function bind() {
+      document.querySelectorAll(".tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab, .view").forEach(el => el.classList.remove("active"));
+          btn.classList.add("active");
+          document.querySelector("#" + btn.dataset.view).classList.add("active");
+          if (btn.dataset.view === "analysis") renderAnalysis();
+        });
+      });
+
+      document.body.addEventListener("click", e => {
+        const open = e.target.closest("[data-open]");
+        if (open) window.open(open.dataset.open, "_blank", "noopener");
+        const memo = e.target.closest("[data-memo]");
+        if (memo) {
+          state.reviews.push({ channel: "조사 메모", place: memo.dataset.memo, sentiment: "중립", text: "확인 필요", count: 1, url: "" });
+          save(); renderReviews();
+          document.querySelector('[data-view="reviews"]').click();
+        }
+        const dr = e.target.closest("[data-del-review]");
+        if (dr) { state.reviews.splice(Number(dr.dataset.delReview), 1); save(); renderReviews(); renderMetrics(); }
+        const di = e.target.closest("[data-del-indicator]");
+        if (di) { state.indicators.splice(Number(di.dataset.delIndicator), 1); save(); renderIndicators(); }
+        const dc = e.target.closest("[data-del-city]");
+        if (dc) { state.cities.splice(Number(dc.dataset.delCity), 1); save(); renderCities(); }
+      });
+
+      document.querySelector("#sourceSearch").addEventListener("input", renderSources);
+      document.querySelector("#addReview").addEventListener("click", () => {
+        state.reviews.push({
+          channel: document.querySelector("#reviewChannel").value,
+          place: document.querySelector("#reviewPlace").value || "미분류",
+          sentiment: document.querySelector("#reviewSentiment").value,
+          text: document.querySelector("#reviewText").value || "표현 없음",
+          count: Number(document.querySelector("#reviewCount").value || 1),
+          url: document.querySelector("#reviewUrl").value
+        });
+        document.querySelector("#reviewText").value = "";
+        save(); renderReviews(); renderMetrics();
+      });
+      document.querySelector("#clearReviews").addEventListener("click", () => {
+        if (confirm("후기 기록을 모두 지울까요?")) {
+          state.reviews = [];
+          save(); renderReviews(); renderMetrics();
+        }
+      });
+      document.querySelector("#addIndicator").addEventListener("click", () => {
+        state.indicators.push({ name: "새 지표", sejong: 0, compare: 0, unit: "건", source: "출처 입력" });
+        save(); renderIndicators();
+      });
+      document.querySelector("#addCity").addEventListener("click", () => {
+        state.cities.push({ city: "새 도시", reason: "", youth: 0, spaces: 0, mentions: 0, memo: "" });
+        save(); renderCities();
+      });
+      ["problemText", "evidenceText", "causeText", "opportunityText"].forEach(id => {
+        document.querySelector("#" + id).addEventListener("input", e => {
+          const key = { problemText: "problem", evidenceText: "evidence", causeText: "cause", opportunityText: "opportunity" }[id];
+          state.analysis[key] = e.target.value;
+          save(); renderAnalysis();
+        });
+      });
+      document.querySelector("#extractBtn").addEventListener("click", extractText);
+      document.querySelector("#useExtractBtn").addEventListener("click", () => {
+        if (!lastExtract.length) extractText();
+        lastExtract.slice(0, 5).forEach(([k, n]) => {
+          state.reviews.push({ channel: "붙여넣기 추출", place: "텍스트 원문", sentiment: ["고립", "은둔", "외로움", "부족", "어색"].includes(k) ? "부정" : "중립", text: k, count: n, url: "" });
+        });
+        save(); renderReviews(); renderMetrics();
+      });
+      document.querySelector("#jsonBtn").addEventListener("click", () => download("sejong-youth-community-data.json", JSON.stringify(state, null, 2), "application/json;charset=utf-8"));
+      document.querySelector("#csvBtn").addEventListener("click", exportCsv);
+      document.querySelector("#importBtn").addEventListener("click", () => document.querySelector("#importFile").click());
+      document.querySelector("#importFile").addEventListener("change", async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const data = JSON.parse(await file.text());
+        Object.assign(state, data);
+        save(); renderAll();
+      });
+      document.querySelector("#copyBrief").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(document.querySelector("#brief").textContent);
+        document.querySelector("#copyBrief").textContent = "복사됨";
+        setTimeout(() => document.querySelector("#copyBrief").textContent = "브리프 복사", 1200);
+      });
+    }
+
+    function renderAll() {
+      renderSources();
+      renderReviews();
+      renderCities();
+      renderIndicators();
+      renderAnalysis();
+    }
+
+    bind();
+    renderAll();
+  </script>
+</body>
+</html>
