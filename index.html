@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>세종 청년 정주·일자리 정량 데이터 워크벤치</title>
+  <style>
+    :root {
+      --bg: #f4f7f6;
+      --panel: #ffffff;
+      --ink: #171d23;
+      --muted: #5d6872;
+      --line: #d8dedc;
+      --teal: #087b72;
+      --teal-dark: #05645d;
+      --soft-teal: #e8f5f2;
+      --red: #bc5847;
+      --shadow: 0 26px 55px rgba(24, 42, 48, .09);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 4% 24%, rgba(8, 123, 114, .06), transparent 280px),
+        linear-gradient(90deg, #f8faf9 0, #f8faf9 58%, #f1f6f5 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      height: 89px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(250, 251, 250, .86);
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar {
+      width: min(1100px, calc(100vw - 32px));
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 2px;
+      color: var(--teal-dark);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 3vw, 34px);
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    button, a.button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 7px 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button.primary, a.button.primary {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    button.danger {
+      color: #9d463b;
+      border-color: #e7c8c0;
+      background: #fff8f6;
+    }
+
+    main {
+      width: min(1100px, calc(100vw - 32px));
+      margin: 20px auto 42px;
+      display: grid;
+      grid-template-columns: 176px minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    nav {
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 9px;
+    }
+
+    .nav-item {
+      width: 100%;
+      min-height: 37px;
+      margin: 0 0 7px;
+      border: 0;
+      background: transparent;
+      color: #4c5862;
+      text-align: left;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 750;
+    }
+
+    .nav-item.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .workspace {
+      min-height: 542px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .view-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 27px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .search {
+      width: 200px;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      min-height: 188px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge {
+      align-self: flex-start;
+      border-radius: 999px;
+      background: var(--soft-teal);
+      color: var(--teal-dark);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .card h3 {
+      margin: 12px 0 7px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .card p {
+      margin: 0;
+      color: #4e5962;
+      font-size: 13px;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 5px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #323c45;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 9px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: vertical;
+    }
+
+    .form-panel {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 13px;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .form-grid.five {
+      grid-template-columns: 1.15fr 1fr 1fr 1fr 1fr auto;
+    }
+
+    .wide { grid-column: span 2; }
+    .full { grid-column: 1 / -1; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: auto;
+      background: #fff;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f4f7f6;
+      color: #34414a;
+      font-size: 12px;
+    }
+
+    td.num, th.num { text-align: right; }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 2.25fr) minmax(230px, 1fr);
+      gap: 14px;
+    }
+
+    .keyword-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      min-height: 208px;
+    }
+
+    .keyword-box h3 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tags span {
+      border-radius: 999px;
+      background: #eaf2fb;
+      color: #315a7a;
+      padding: 4px 9px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 13px;
+      min-height: 112px;
+    }
+
+    .metric span {
+      display: block;
+      font-size: 13px;
+      color: #45515a;
+    }
+
+    .metric b {
+      display: block;
+      margin-top: 4px;
+      font-size: 28px;
+      color: var(--red);
+      line-height: 1.1;
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #4d5961;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .brief {
+      min-height: 250px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 880px) {
+      header { height: auto; padding: 16px 0; }
+      .topbar { align-items: flex-start; }
+      main { grid-template-columns: 1fr; }
+      nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+      .nav-item { margin: 0; }
+      .cards, .metric-grid, .analysis-grid, .split { grid-template-columns: 1fr; }
+      .form-grid, .form-grid.five { grid-template-columns: 1fr 1fr; }
+      .wide, .full { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 560px) {
+      .topbar { flex-direction: column; }
+      .workspace { padding: 16px; }
+      nav, .form-grid, .form-grid.five { grid-template-columns: 1fr; }
+      h1 { font-size: 27px; }
+      h2 { font-size: 24px; }
+      .search { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">SEJONG YOUTH POLICY DESIGN</p>
+        <h1>세종 청년 정주·일자리 정량 데이터 워크벤치</h1>
+      </div>
+      <div class="top-actions">
+        <button id="exportJson">JSON</button>
+        <button class="primary" id="exportCsv">CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <nav aria-label="워크벤치 메뉴">
+      <button class="nav-item active" data-view="public">공공데이터</button>
+      <button class="nav-item" data-view="review">후기 조사</button>
+      <button class="nav-item" data-view="compare">비교도시</button>
+      <button class="nav-item" data-view="metrics">정량 정리</button>
+      <button class="nav-item" data-view="problem">문제 분석</button>
+    </nav>
+
+    <section class="workspace">
+      <div class="view active" id="public">
+        <div class="view-head">
+          <div>
+            <h2>공공데이터 링크 접근</h2>
+            <p class="sub">청년 고용, 인턴십, 채용 공고, 인구 이동, 정주 자료를 빠르게 확인합니다.</p>
+          </div>
+          <input class="search" id="sourceSearch" placeholder="출처 또는 키워드 검색">
+        </div>
+        <div class="cards" id="sourceCards"></div>
+      </div>
+
+      <div class="view" id="review">
+        <div class="view-head">
+          <div>
+            <h2>청년 후기 조사</h2>
+            <p class="sub">공공기관 웹사이트, 채용 후기, 블로그, 커뮤니티에서 반복 표현을 기록합니다.</p>
+          </div>
+          <button id="resetReviews">후기 초기화</button>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-grid">
+            <div>
+              <label for="reviewChannel">조사 채널</label>
+              <select id="reviewChannel">
+                <option>고용24/워크넷</option>
+                <option>공공기관 채용 홈페이지</option>
+                <option>세종청년센터</option>
+                <option>대학 커뮤니티</option>
+                <option>취업 커뮤니티</option>
+                <option>블로그/언론</option>
+              </select>
+            </div>
+            <div>
+              <label for="reviewPlace">기관/장소/게시판</label>
+              <input id="reviewPlace" placeholder="예: 세종청년센터, 공공기관 채용">
+            </div>
+            <div>
+              <label for="reviewSentiment">감성</label>
+              <select id="reviewSentiment">
+                <option value="-1">부정</option>
+                <option value="0">중립</option>
+                <option value="1">긍정</option>
+              </select>
+            </div>
+            <div class="wide">
+              <label for="reviewPhrase">핵심 표현</label>
+              <input id="reviewPhrase" placeholder="예: 인턴 공고가 적다, 신입 채용은 대전에 더 많다">
+            </div>
+            <div>
+              <label for="reviewCount">빈도</label>
+              <input id="reviewCount" type="number" min="1" value="1">
+            </div>
+            <div>
+              <label for="reviewUrl">URL</label>
+              <input id="reviewUrl" placeholder="https://">
+            </div>
+            <button class="primary wide" id="addReview">기록 추가</button>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="table-wrap">
+            <table id="reviewTable">
+              <thead>
+                <tr><th>채널</th><th>기관/게시판</th><th>감성</th><th>표현</th><th class="num">빈도</th><th></th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <aside class="keyword-box">
+            <h3>후기 키워드</h3>
+            <div class="tags" id="keywordTags"></div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="view" id="compare">
+        <div class="view-head">
+          <div>
+            <h2>비교도시 데이터 조사</h2>
+            <p class="sub">세종과 대전·청주·천안 등 주변 도시의 청년 기회 밀도를 같은 기준으로 입력합니다.</p>
+          </div>
+          <button id="seedCities">비교도시 틀</button>
+        </div>
+
+        <div class="form-panel">
+          <div class="form-grid">
+            <div>
+              <label for="cityName">도시</label>
+              <input id="cityName" value="세종">
+            </div>
+            <div>
+              <label for="jobPosts">인턴/신입 공고 수</label>
+              <input id="jobPosts" type="number" min="0" value="0">
+            </div>
+            <div>
+              <label for="youthPop">청년 인구</label>
+              <input id="youthPop" type="number" min="0" value="0">
+            </div>
+            <div>
+              <label for="employmentRate">청년 고용률(%)</label>
+              <input id="employmentRate" type="number" min="0" max="100" step="0.1" value="0">
+            </div>
+            <div>
+              <label for="unemploymentRate">청년 실업률(%)</label>
+              <input id="unemploymentRate" type="number" min="0" max="100" step="0.1" value="0">
+            </div>
+            <div>
+              <label for="citySource">출처</label>
+              <input id="citySource" placeholder="KOSIS, 고용24, 지자체 자료">
+            </div>
+            <button class="primary wide" id="addCity">도시 추가</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="cityTable">
+            <thead>
+              <tr><th>도시</th><th class="num">공고 수</th><th class="num">청년 인구</th><th class="num">공고/1만명</th><th class="num">고용률</th><th class="num">실업률</th><th>출처</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="view" id="metrics">
+        <div class="view-head">
+          <div>
+            <h2>정량 데이터 정리</h2>
+            <p class="sub">워크숍에서 합의한 지표를 입력하면 격차 신호가 자동 계산됩니다.</p>
+          </div>
+          <button id="addMetric">지표 추가</button>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric"><span>기회 부족 지수</span><b id="lackIndex">0</b><small>높을수록 정책 문제를 다루기 좋음</small></div>
+          <div class="metric"><span>부정 후기 비율</span><b id="negativeRate">0%</b><small>후기 조사 입력값 기준</small></div>
+          <div class="metric"><span>비교도시 평균 대비</span><b id="cityGap">0%</b><small>공고/청년 1만명 기준</small></div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="metricTable">
+            <thead>
+              <tr><th>지표</th><th>세종 값</th><th>비교 값</th><th>단위</th><th>출처</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="view" id="problem">
+        <div class="view-head">
+          <div>
+            <h2>정책 문제 분석</h2>
+            <p class="sub">수집한 증거를 문제정의 문장과 정책 가설로 정리합니다.</p>
+          </div>
+          <button id="copyBrief">브리프 복사</button>
+        </div>
+
+        <div class="analysis-grid">
+          <div>
+            <label for="problemSentence">정책 문제 문장</label>
+            <textarea id="problemSentence"></textarea>
+          </div>
+          <div>
+            <label for="evidenceText">정량 근거</label>
+            <textarea id="evidenceText"></textarea>
+          </div>
+          <div>
+            <label for="causeText">원인 가설</label>
+            <textarea id="causeText"></textarea>
+          </div>
+          <div>
+            <label for="policyText">정책 기회</label>
+            <textarea id="policyText"></textarea>
+          </div>
+        </div>
+
+        <div class="brief" id="briefText"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const storeKey = "sejong-youth-workbench-v2";
+    const sourceData = [
+      ["고용 통계", "KOSIS 국가통계포털", "청년 고용률·실업률·경제활동참가율을 비교도시에 맞춰 확인합니다.", "https://kosis.kr/"],
+      ["공공데이터", "공공데이터포털", "세종특별자치시 청년, 일자리, 사업체, 인구 이동 데이터를 검색합니다.", "https://www.data.go.kr/"],
+      ["지역 데이터", "세종시 통계", "세종시가 공개하는 인구, 산업, 생활, 정주 관련 지표를 확인합니다.", "https://www.sejong.go.kr/stat.do"],
+      ["청년정책", "세종청년센터", "청년 프로그램, 취업 지원, 참여 공고와 현장 후기를 점검합니다.", "https://sjyouth.or.kr/"],
+      ["채용", "고용24", "세종 지역 인턴, 신입, 경력무관 채용 공고 수를 조사합니다.", "https://www.work24.go.kr/"],
+      ["채용", "워크넷", "지역·직무·경력 조건별 공고 검색으로 기회 접근성을 확인합니다.", "https://www.work.go.kr/"],
+      ["공공기관", "ALIO 공공기관 경영정보", "공공기관 청년인턴, 신규채용, 지역인재 정보를 확인합니다.", "https://www.alio.go.kr/"],
+      ["공공채용", "나라일터", "공공부문 채용 공고와 세종 근무지 여부를 확인합니다.", "https://www.gojobs.go.kr/"],
+      ["검색", "웹 후기 검색", "취업 후기, 커뮤니티, 블로그에서 반복 표현과 체감 문제를 수집합니다.", "https://www.google.com/search?q=%EC%84%B8%EC%A2%85+%EC%B2%AD%EB%85%84+%EC%B7%A8%EC%97%85+%EC%9D%B8%ED%84%B4+%ED%9B%84%EA%B8%B0"]
+    ];
+
+    const initialState = {
+      reviews: [
+        { channel: "취업 커뮤니티", place: "세종 청년 취업 게시글", sentiment: -1, phrase: "인턴 공고가 적고 신입 채용은 대전에 더 많다는 표현", count: 4, url: "" },
+        { channel: "대학 커뮤니티", place: "지역 취업 게시판", sentiment: -1, phrase: "희망 직무 공고가 반복되고 선택지가 제한적이라는 표현", count: 3, url: "" }
+      ],
+      cities: [
+        { name: "세종", jobs: 0, youth: 0, emp: 0, unemp: 0, source: "고용24/KOSIS 조사값 입력" },
+        { name: "대전", jobs: 0, youth: 0, emp: 0, unemp: 0, source: "고용24/KOSIS 조사값 입력" }
+      ],
+      metrics: [
+        { name: "인턴/신입 공고 수", sejong: 0, compare: 0, unit: "건", source: "고용24/워크넷" },
+        { name: "청년 고용률", sejong: 0, compare: 0, unit: "%", source: "KOSIS" },
+        { name: "공공기관 청년인턴 수", sejong: 0, compare: 0, unit: "명", source: "ALIO" }
+      ]
+    };
+
+    const state = JSON.parse(localStorage.getItem(storeKey) || JSON.stringify(initialState));
+    const $ = id => document.getElementById(id);
+
+    function save() {
+      localStorage.setItem(storeKey, JSON.stringify(state));
+      render();
+    }
+
+    function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;" }[ch]));
+    }
+
+    function sentimentLabel(value) {
+      const n = Number(value);
+      return n < 0 ? "부정" : n > 0 ? "긍정" : "중립";
+    }
+
+    function cityDensity(city) {
+      return Number(city.youth) > 0 ? Number(city.jobs) / Number(city.youth) * 10000 : 0;
+    }
+
+    function computed() {
+      const total = state.reviews.reduce((sum, item) => sum + Number(item.count || 0), 0);
+      const negative = state.reviews.filter(item => Number(item.sentiment) < 0).reduce((sum, item) => sum + Number(item.count || 0), 0);
+      const lackWords = /인턴|신입|채용|공고|일자리|취업|기회|직무|선택지|부족|제한/;
+      const lack = state.reviews.filter(item => lackWords.test(item.phrase)).reduce((sum, item) => sum + Number(item.count || 0), 0);
+      const sejong = state.cities.find(city => city.name.includes("세종"));
+      const sejongDensity = sejong ? cityDensity(sejong) : 0;
+      const others = state.cities.filter(city => !city.name.includes("세종"));
+      const avg = others.length ? others.reduce((sum, city) => sum + cityDensity(city), 0) / others.length : 0;
+      const gap = avg > 0 ? ((sejongDensity - avg) / avg) * 100 : 0;
+      const metricGap = state.metrics.reduce((sum, metric) => sum + Math.max(0, Number(metric.compare || 0) - Number(metric.sejong || 0)), 0);
+      const lackIndex = Math.round((total ? negative / total * 40 : 0) + Math.min(40, lack * 3) + Math.min(20, metricGap));
+      return { total, negative, negativeRate: total ? negative / total * 100 : 0, lack, sejongDensity, avg, gap, lackIndex };
+    }
+
+    function renderSources() {
+      const keyword = $("sourceSearch").value.trim();
+      const list = sourceData.filter(item => !keyword || item.join(" ").includes(keyword));
+      $("sourceCards").innerHTML = list.map(item => `
+        <article class="card">
+          <div>
+            <span class="badge">${esc(item[0])}</span>
+            <h3>${esc(item[1])}</h3>
+            <p>${esc(item[2])}</p>
+          </div>
+          <div class="card-actions">
+            <a class="button" href="${esc(item[3])}" target="_blank" rel="noopener">열기</a>
+            <button data-source-memo="${esc(item[1])}">조사 메모</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderReviews() {
+      $("reviewTable").querySelector("tbody").innerHTML = state.reviews.map((item, index) => `
+        <tr>
+          <td>${esc(item.channel)}</td>
+          <td>${esc(item.place)}</td>
+          <td>${sentimentLabel(item.sentiment)}</td>
+          <td>${esc(item.phrase)} ${item.url ? `<br><a href="${esc(item.url)}" target="_blank" rel="noopener">URL</a>` : ""}</td>
+          <td class="num">${Number(item.count).toLocaleString()}</td>
+          <td><button class="danger" data-delete-review="${index}">삭제</button></td>
+        </tr>
+      `).join("");
+
+      const tags = {};
+      state.reviews.forEach(item => {
+        item.phrase.split(/[\s,，.]+/).map(word => word.trim()).filter(word => word.length > 1).forEach(word => {
+          tags[word] = (tags[word] || 0) + Number(item.count || 1);
+        });
+      });
+      $("keywordTags").innerHTML = Object.entries(tags).sort((a, b) => b[1] - a[1]).slice(0, 14).map(([word, count]) => `<span>${esc(word)} ${count}</span>`).join("") || "<span>키워드 없음</span>";
+    }
+
+    function renderCities() {
+      $("cityTable").querySelector("tbody").innerHTML = state.cities.map((city, index) => `
+        <tr>
+          <td>${esc(city.name)}</td>
+          <td class="num">${Number(city.jobs).toLocaleString()}</td>
+          <td class="num">${Number(city.youth).toLocaleString()}</td>
+          <td class="num">${cityDensity(city).toFixed(2)}</td>
+          <td class="num">${Number(city.emp || 0).toFixed(1)}%</td>
+          <td class="num">${Number(city.unemp || 0).toFixed(1)}%</td>
+          <td>${esc(city.source)}</td>
+          <td><button class="danger" data-delete-city="${index}">삭제</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function renderMetrics() {
+      const c = computed();
+      $("lackIndex").textContent = c.lackIndex;
+      $("negativeRate").textContent = `${c.negativeRate.toFixed(0)}%`;
+      $("cityGap").textContent = `${c.gap.toFixed(0)}%`;
+
+      $("metricTable").querySelector("tbody").innerHTML = state.metrics.map((metric, index) => `
+        <tr>
+          <td><input value="${esc(metric.name)}" data-metric="${index}" data-field="name"></td>
+          <td><input type="number" value="${esc(metric.sejong)}" data-metric="${index}" data-field="sejong"></td>
+          <td><input type="number" value="${esc(metric.compare)}" data-metric="${index}" data-field="compare"></td>
+          <td><input value="${esc(metric.unit)}" data-metric="${index}" data-field="unit"></td>
+          <td><input value="${esc(metric.source)}" data-metric="${index}" data-field="source"></td>
+          <td><button class="danger" data-delete-metric="${index}">삭제</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function renderProblem() {
+      const c = computed();
+      const topPhrase = state.reviews.slice().sort((a, b) => Number(b.count) - Number(a.count))[0]?.phrase || "인턴십·신입 채용 기회 부족에 대한 반복 표현 입력 필요";
+      const evidence = [
+        `부정 후기 ${c.negative}건, 전체 후기 빈도 ${c.total}건`,
+        `기회 부족 관련 언급 ${c.lack}건`,
+        `세종 공고 밀도 ${c.sejongDensity.toFixed(2)}건/청년 1만명`,
+        `비교도시 평균 대비 ${c.gap.toFixed(0)}%`
+      ].join("\n");
+
+      if (!$("problemSentence").value) {
+        $("problemSentence").value = `세종시는 행정수도와 공공기관 집적 이미지는 강하지만, 청년이 지역 안에서 첫 경력을 만들 인턴십·신입 채용 기회와 정보 접근성이 부족하다.`;
+      }
+      if (!$("evidenceText").value) $("evidenceText").value = evidence;
+      if (!$("causeText").value) $("causeText").value = `공공기관 채용 정보와 지역 청년정책 정보가 분산되어 있고, 세종 내 기업·직무 다양성이 낮아 청년 구직 범위가 주변 도시로 확장되는 구조`;
+      if (!$("policyText").value) $("policyText").value = `세종형 청년 인턴십 매칭, 공공기관 지역인재 경험 프로그램, 신입·경력무관 공고 통합 지도, 주변도시 통근권 비교 정보를 연결한 청년 일자리 플랫폼`;
+
+      $("briefText").textContent = `[정책 문제]\n${$("problemSentence").value}\n\n[정량 근거]\n${$("evidenceText").value}\n\n[핵심 후기]\n${topPhrase}\n\n[원인 가설]\n${$("causeText").value}\n\n[정책 기회]\n${$("policyText").value}`;
+    }
+
+    function render() {
+      renderSources();
+      renderReviews();
+      renderCities();
+      renderMetrics();
+      renderProblem();
+    }
+
+    function download(filename, text, type) {
+      const blob = new Blob(["\ufeff" + text], { type });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function exportCsv() {
+      const rows = [["kind","name","field1","field2","field3","field4","source"]];
+      state.reviews.forEach(item => rows.push(["review", item.channel, item.place, sentimentLabel(item.sentiment), item.phrase, item.count, item.url]));
+      state.cities.forEach(city => rows.push(["city", city.name, city.jobs, city.youth, cityDensity(city).toFixed(3), city.emp, city.source]));
+      state.metrics.forEach(metric => rows.push(["metric", metric.name, metric.sejong, metric.compare, metric.unit, "", metric.source]));
+      download("sejong-youth-workbench.csv", rows.map(row => row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")).join("\n"), "text/csv;charset=utf-8");
+    }
+
+    function exportJson() {
+      download("sejong-youth-workbench.json", JSON.stringify({ ...state, computed: computed(), brief: $("briefText").textContent }, null, 2), "application/json;charset=utf-8");
+    }
+
+    document.addEventListener("click", event => {
+      const nav = event.target.closest("[data-view]");
+      if (nav) {
+        document.querySelectorAll("[data-view]").forEach(item => item.classList.toggle("active", item === nav));
+        document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === nav.dataset.view));
+      }
+
+      const sourceMemo = event.target.closest("[data-source-memo]");
+      if (sourceMemo) {
+        $("reviewChannel").value = "블로그/언론";
+        $("reviewPlace").value = sourceMemo.dataset.sourceMemo;
+        document.querySelector('[data-view="review"]').click();
+      }
+
+      const reviewDelete = event.target.closest("[data-delete-review]");
+      if (reviewDelete) {
+        state.reviews.splice(Number(reviewDelete.dataset.deleteReview), 1);
+        save();
+      }
+
+      const cityDelete = event.target.closest("[data-delete-city]");
+      if (cityDelete) {
+        state.cities.splice(Number(cityDelete.dataset.deleteCity), 1);
+        save();
+      }
+
+      const metricDelete = event.target.closest("[data-delete-metric]");
+      if (metricDelete) {
+        state.metrics.splice(Number(metricDelete.dataset.deleteMetric), 1);
+        save();
+      }
+    });
+
+    $("sourceSearch").addEventListener("input", renderSources);
+    $("addReview").addEventListener("click", () => {
+      state.reviews.push({
+        channel: $("reviewChannel").value,
+        place: $("reviewPlace").value || "미입력",
+        sentiment: Number($("reviewSentiment").value),
+        phrase: $("reviewPhrase").value || "미입력",
+        count: Number($("reviewCount").value || 1),
+        url: $("reviewUrl").value
+      });
+      $("reviewPhrase").value = "";
+      $("reviewUrl").value = "";
+      $("reviewCount").value = 1;
+      save();
+    });
+    $("resetReviews").addEventListener("click", () => {
+      state.reviews = [];
+      save();
+    });
+    $("seedCities").addEventListener("click", () => {
+      state.cities = ["세종", "대전", "청주", "천안"].map(name => ({ name, jobs: 0, youth: 0, emp: 0, unemp: 0, source: "조사값 입력" }));
+      save();
+    });
+    $("addCity").addEventListener("click", () => {
+      state.cities.push({
+        name: $("cityName").value || "미입력",
+        jobs: Number($("jobPosts").value || 0),
+        youth: Number($("youthPop").value || 0),
+        emp: Number($("employmentRate").value || 0),
+        unemp: Number($("unemploymentRate").value || 0),
+        source: $("citySource").value
+      });
+      save();
+    });
+    $("addMetric").addEventListener("click", () => {
+      state.metrics.push({ name: "새 지표", sejong: 0, compare: 0, unit: "건", source: "출처 입력" });
+      save();
+    });
+    $("metricTable").addEventListener("input", event => {
+      const input = event.target.closest("[data-metric]");
+      if (!input) return;
+      const row = state.metrics[Number(input.dataset.metric)];
+      const field = input.dataset.field;
+      row[field] = ["sejong", "compare"].includes(field) ? Number(input.value || 0) : input.value;
+      save();
+    });
+    ["problemSentence", "evidenceText", "causeText", "policyText"].forEach(id => {
+      $(id).addEventListener("input", renderProblem);
+    });
+    $("copyBrief").addEventListener("click", () => navigator.clipboard.writeText($("briefText").textContent));
+    $("exportCsv").addEventListener("click", exportCsv);
+    $("exportJson").addEventListener("click", exportJson);
+
+    render();
+  </script>
+</body>
+</html>
