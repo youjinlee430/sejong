@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>세종 생활격차 정량 데이터 워크벤치</title>
+  <style>
+:root {
+  --ink: #17211f;
+  --muted: #5e6b67;
+  --line: #d5dfdc;
+  --bg: #eef3f2;
+  --panel: #ffffff;
+  --soft: #f6f9f8;
+  --brand: #05796c;
+  --brand-dark: #00675e;
+  --danger: #d15636;
+  --chip: #e8f1ff;
+  font-family: "Segoe UI", "Pretendard", "Noto Sans KR", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.app-header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px clamp(16px, 3vw, 32px);
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.app-header p {
+  margin: 0 0 4px;
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 13px;
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--brand);
+}
+
+.header-actions button:last-child,
+.form-card button,
+.nav-item.active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  gap: 18px;
+  max-width: 1100px;
+  margin: 20px auto 42px;
+  padding: 0 14px;
+}
+
+.side-nav {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  display: grid;
+  gap: 6px;
+  padding: 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.nav-item {
+  width: 100%;
+  min-height: 38px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #41524d;
+  text-align: left;
+  padding: 9px 12px;
+}
+
+.stage {
+  display: none;
+}
+
+.stage.active {
+  display: block;
+}
+
+.panel {
+  min-height: 540px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.panel-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.panel-head h2 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+.panel-head p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-grid article {
+  min-height: 112px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.stat-grid span,
+label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.stat-grid strong {
+  display: block;
+  margin: 8px 0 3px;
+  color: var(--danger);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.stat-grid small {
+  color: var(--muted);
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.data-grid article,
+.guide-box,
+.keyword-box,
+.table-box,
+.form-card,
+.brief-preview {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.data-grid article,
+.guide-box,
+.keyword-box,
+.brief-preview {
+  padding: 14px;
+}
+
+.data-grid h3,
+.guide-box h3,
+.keyword-box h3 {
+  margin: 0 0 8px;
+}
+
+.data-grid p,
+.guide-box p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.data-grid a {
+  color: var(--brand);
+  font-weight: 900;
+}
+
+.guide-box {
+  margin-top: 12px;
+}
+
+.issue-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.form-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.form-card .wide {
+  grid-column: span 2;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #cbd8d5;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: #fff;
+}
+
+textarea {
+  min-height: 108px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 255px;
+  gap: 14px;
+}
+
+.table-box {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  background: var(--soft);
+}
+
+td input,
+td select {
+  min-width: 110px;
+}
+
+.delete {
+  border-color: #ffc4b8;
+  color: var(--danger);
+  background: #fff7f4;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips span {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: #3262a6;
+  font-weight: 900;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.brief-preview {
+  min-height: 280px;
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+
+@media (max-width: 820px) {
+  .app-header {
+    height: auto;
+    align-items: start;
+  }
+
+  .app-shell,
+  .split,
+  .problem-grid,
+  .data-grid,
+  .issue-list,
+  .stat-grid,
+  .form-card {
+    grid-template-columns: 1fr;
+  }
+
+  .side-nav {
+    position: static;
+  }
+
+  .form-card .wide {
+    grid-column: auto;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p>SEJONG URBAN GAP POLICY DESIGN</p>
+      <h1>세종 생활격차 정량 데이터 워크벤치</h1>
+    </div>
+    <div class="header-actions">
+      <button type="button" id="exportJson">JSON</button>
+      <button type="button" id="exportCsv">CSV</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="side-nav" aria-label="워크벤치 단계">
+      <button class="nav-item active" type="button" data-view="data">공공데이터</button>
+      <button class="nav-item" type="button" data-view="reviews">후기 조사</button>
+      <button class="nav-item" type="button" data-view="compare">비교도시</button>
+      <button class="nav-item" type="button" data-view="metrics">정량 정리</button>
+      <button class="nav-item" type="button" data-view="problem">문제 분석</button>
+    </aside>
+
+    <section class="stage active" id="view-data">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>공공데이터</h2>
+            <p>워크숍에서 바로 사용할 자료와 지표 정의입니다. 자료를 찾으면 출처와 수집일을 함께 기록합니다.</p>
+          </div>
+          <button type="button" id="loadDemo">예시 데이터 적용</button>
+        </div>
+
+        <div class="stat-grid">
+          <article>
+            <span>핵심 분야</span>
+            <strong>5</strong>
+            <small>생활·문화·상권·교통·인프라</small>
+          </article>
+          <article>
+            <span>권장 지표</span>
+            <strong>12</strong>
+            <small>인구·면적·수요층 정규화</small>
+          </article>
+          <article>
+            <span>결과물</span>
+            <strong>1</strong>
+            <small>정책 문제 브리프</small>
+          </article>
+        </div>
+
+        <div class="data-grid">
+          <article>
+            <h3>공공데이터포털</h3>
+            <p>세종특별자치시 문화시설, 체육시설업, 버스운행, BRT 정류장, 공공시설 현황 검색.</p>
+            <a href="https://www.data.go.kr/index.do" target="_blank" rel="noreferrer">열기</a>
+          </article>
+          <article>
+            <h3>KOSIS</h3>
+            <p>읍면동 인구, 연령별 인구, 사업체, 주택 자료. 시설 수를 인구 1만 명당으로 바꿀 때 사용.</p>
+            <a href="https://kosis.kr" target="_blank" rel="noreferrer">열기</a>
+          </article>
+          <article>
+            <h3>상가업소정보</h3>
+            <p>생활밀착 업종, 여가·문화 업종, 점포 분포와 업종 다양성 비교.</p>
+            <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15012005" target="_blank" rel="noreferrer">열기</a>
+          </article>
+          <article>
+            <h3>교통·문화 자료</h3>
+            <p>국가교통DB, 세종 교통정보센터, 문화포털로 이동시간·배차·행사·시설을 보완 확인.</p>
+            <a href="https://bis.sejong.go.kr/web/main/main.view" target="_blank" rel="noreferrer">열기</a>
+          </article>
+        </div>
+
+        <div class="guide-box">
+          <h3>워크숍 문제 후보</h3>
+          <div class="issue-list">
+            <p><b>생활서비스:</b> 의료·복지·돌봄 접근성, 고령인구 대비 시설 부족</p>
+            <p><b>문화·여가:</b> 시설 수와 프로그램 수의 불균형, 저녁·주말 콘텐츠 부족</p>
+            <p><b>상권:</b> 업종 다양성, 청년·가족 체류 공간, 전통상권과 신도심 상권 연결성</p>
+            <p><b>교통:</b> 배차간격, 환승 부담, 구도심-신도심 이동시간, 야간 이동성</p>
+            <p><b>인프라:</b> 공원·체육·공공서비스 시설의 생활권 내 접근성</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="view-reviews">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>후기 조사</h2>
+            <p>민원, 인터뷰, 현장 메모, 온라인 후기에서 반복 표현을 기록합니다.</p>
+          </div>
+          <button type="button" id="resetReviews">후기 초기화</button>
+        </div>
+
+        <div class="form-card">
+          <label>조사 채널
+            <select id="reviewChannel">
+              <option>현장 인터뷰</option>
+              <option>민원/제안 게시판</option>
+              <option>지도/블로그 후기</option>
+              <option>지역 커뮤니티</option>
+            </select>
+          </label>
+          <label>지역/장소
+            <input id="reviewPlace" placeholder="예: 조치원읍, 행복도시 1생활권">
+          </label>
+          <label>감성
+            <select id="reviewTone">
+              <option>부정</option>
+              <option>중립</option>
+              <option>긍정</option>
+            </select>
+          </label>
+          <label class="wide">핵심 표현
+            <input id="reviewText" placeholder="예: 버스 배차가 길다, 야간 콘텐츠가 부족하다">
+          </label>
+          <label>빈도
+            <input id="reviewCount" type="number" min="1" value="1">
+          </label>
+          <label>URL
+            <input id="reviewUrl" placeholder="https://">
+          </label>
+          <button type="button" id="addReview">기록 추가</button>
+        </div>
+
+        <div class="split">
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr>
+                  <th>채널</th>
+                  <th>장소</th>
+                  <th>감성</th>
+                  <th>표현</th>
+                  <th>빈도</th>
+                  <th>삭제</th>
+                </tr>
+              </thead>
+              <tbody id="reviewRows"></tbody>
+            </table>
+          </div>
+          <div class="keyword-box">
+            <h3>후기 키워드</h3>
+            <div class="chips" id="keywordChips"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="view-compare">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>비교도시</h2>
+            <p>세종 구도심과 신도심을 같은 기준으로 비교합니다. 비교값은 신도심 또는 목표 기준입니다.</p>
+          </div>
+          <button type="button" id="addCompare">항목 추가</button>
+        </div>
+
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>비교 항목</th>
+                <th>구도심 기준</th>
+                <th>신도심/목표 기준</th>
+                <th>판단</th>
+                <th>메모</th>
+              </tr>
+            </thead>
+            <tbody id="compareRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="view-metrics">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>정량 데이터 정리</h2>
+            <p>워크숍에서 합의한 지표를 입력하면 격차 신호가 자동 계산됩니다.</p>
+          </div>
+          <button type="button" id="addMetric">지표 추가</button>
+        </div>
+
+        <div class="stat-grid">
+          <article>
+            <span>생활격차 지수</span>
+            <strong id="gapScore">0</strong>
+            <small>높을수록 정책 문제화 필요</small>
+          </article>
+          <article>
+            <span>부정 후기 비율</span>
+            <strong id="negativeRate">0%</strong>
+            <small>후기 조사 입력값 기준</small>
+          </article>
+          <article>
+            <span>구도심 평균 대비</span>
+            <strong id="oldAverageGap">0%</strong>
+            <small>비교값 대비 차이</small>
+          </article>
+        </div>
+
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>지표</th>
+                <th>분야</th>
+                <th>구도심 값</th>
+                <th>비교 값</th>
+                <th>단위</th>
+                <th>출처</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody id="metricRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="view-problem">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>정책 문제 분석</h2>
+            <p>수집한 증거를 문제정의 문장과 정책 가설로 정리합니다.</p>
+          </div>
+          <button type="button" id="copyBrief">브리프 복사</button>
+        </div>
+
+        <div class="problem-grid">
+          <label>정책 문제 문장
+            <textarea id="problemText"></textarea>
+          </label>
+          <label>정량 근거
+            <textarea id="evidenceText"></textarea>
+          </label>
+          <label>원인 가설
+            <textarea id="causeText"></textarea>
+          </label>
+          <label>정책 기회
+            <textarea id="opportunityText"></textarea>
+          </label>
+        </div>
+
+        <div class="brief-preview" id="briefPreview"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+const state = {
+  reviews: [
+    { channel: "현장 인터뷰", place: "조치원읍", tone: "부정", text: "버스 배차가 길고 야간 이동이 어렵다", count: 4, url: "" },
+    { channel: "지역 커뮤니티", place: "읍면 지역", tone: "부정", text: "주말에 갈 문화공간과 가족 체류 공간이 부족하다", count: 3, url: "" },
+    { channel: "지도/블로그 후기", place: "행복도시", tone: "긍정", text: "공원과 체육시설은 좋지만 구도심으로 이동하기 불편하다", count: 2, url: "" }
+  ],
+  compares: [
+    { item: "문화시설 접근성", old: "도보 접근 시설 적음", target: "생활권 내 접근 가능", result: "격차 큼", memo: "시설 수와 프로그램 수 분리 확인" },
+    { item: "대중교통 연결성", old: "배차간격 길고 환승 부담", target: "BRT·주요 거점 접근 우수", result: "격차 큼", memo: "야간·주말 시간대 확인" },
+    { item: "상권 다양성", old: "전통상권 중심", target: "생활·여가 업종 다양", result: "중간", memo: "업종 다양도 비교" }
+  ],
+  metrics: [
+    { name: "인구 1만 명당 문화시설 수", category: "문화", oldValue: 1.8, compareValue: 3.4, unit: "개/1만명", source: "문화포털·세종시" },
+    { name: "대중교통 접근성 점수", category: "교통", oldValue: 52, compareValue: 78, unit: "점", source: "KTDB·버스정보" },
+    { name: "생활밀착 점포 수", category: "상권", oldValue: 84, compareValue: 112, unit: "개/1만명", source: "상가업소정보" }
+  ]
+};
+
+const stopwords = new Set(["그리고", "하지만", "있다", "없다", "많다", "적다", "매우", "너무", "정말", "조금", "대한", "에서", "으로", "하다", "된다", "같다"]);
+
+function $(selector) {
+  return document.querySelector(selector);
+}
+
+function switchView(view) {
+  document.querySelectorAll(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+  document.querySelectorAll(".stage").forEach((stage) => stage.classList.toggle("active", stage.id === `view-${view}`));
+  if (view === "problem") updateBrief();
+}
+
+function gapRate(oldValue, compareValue) {
+  const oldNumber = Number(oldValue);
+  const compareNumber = Number(compareValue);
+  const base = Math.max(oldNumber, compareNumber);
+  if (!base) return 0;
+  return Math.abs(compareNumber - oldNumber) / base * 100;
+}
+
+function renderReviews() {
+  $("#reviewRows").innerHTML = state.reviews.map((review, index) => `
+    <tr>
+      <td>${review.channel}</td>
+      <td>${review.place}</td>
+      <td>${review.tone}</td>
+      <td>${review.text}</td>
+      <td>${review.count}</td>
+      <td><button class="delete" type="button" data-delete-review="${index}">삭제</button></td>
+    </tr>
+  `).join("");
+  renderKeywords();
+  updateStats();
+}
+
+function renderKeywords() {
+  const counts = new Map();
+  state.reviews.forEach((review) => {
+    review.text
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter((word) => word.length >= 2 && !stopwords.has(word))
+      .forEach((word) => counts.set(word, (counts.get(word) || 0) + Number(review.count || 1)));
+  });
+
+  const chips = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14);
+  $("#keywordChips").innerHTML = chips.map(([word, count]) => `<span>${word} ${count}</span>`).join("") || "<p>후기를 입력하세요.</p>";
+}
+
+function addReview() {
+  const text = $("#reviewText").value.trim();
+  if (!text) return;
+  state.reviews.push({
+    channel: $("#reviewChannel").value,
+    place: $("#reviewPlace").value.trim() || "미입력",
+    tone: $("#reviewTone").value,
+    text,
+    count: Number($("#reviewCount").value || 1),
+    url: $("#reviewUrl").value.trim()
+  });
+  $("#reviewText").value = "";
+  $("#reviewUrl").value = "";
+  renderAll();
+}
+
+function renderCompare() {
+  $("#compareRows").innerHTML = state.compares.map((row, index) => `
+    <tr>
+      <td><input value="${row.item}" data-compare="${index}" data-field="item"></td>
+      <td><input value="${row.old}" data-compare="${index}" data-field="old"></td>
+      <td><input value="${row.target}" data-compare="${index}" data-field="target"></td>
+      <td><input value="${row.result}" data-compare="${index}" data-field="result"></td>
+      <td><input value="${row.memo}" data-compare="${index}" data-field="memo"></td>
+    </tr>
+  `).join("");
+}
+
+function renderMetrics() {
+  $("#metricRows").innerHTML = state.metrics.map((row, index) => `
+    <tr>
+      <td><input value="${row.name}" data-metric="${index}" data-field="name"></td>
+      <td>
+        <select data-metric="${index}" data-field="category">
+          ${["생활", "문화", "상권", "교통", "인프라"].map((item) => `<option ${item === row.category ? "selected" : ""}>${item}</option>`).join("")}
+        </select>
+      </td>
+      <td><input type="number" step="0.01" value="${row.oldValue}" data-metric="${index}" data-field="oldValue"></td>
+      <td><input type="number" step="0.01" value="${row.compareValue}" data-metric="${index}" data-field="compareValue"></td>
+      <td><input value="${row.unit}" data-metric="${index}" data-field="unit"></td>
+      <td><input value="${row.source}" data-metric="${index}" data-field="source"></td>
+      <td><button class="delete" type="button" data-delete-metric="${index}">삭제</button></td>
+    </tr>
+  `).join("");
+  updateStats();
+}
+
+function updateStats() {
+  const rates = state.metrics.map((metric) => gapRate(metric.oldValue, metric.compareValue));
+  const averageGap = rates.length ? rates.reduce((sum, rate) => sum + rate, 0) / rates.length : 0;
+  const negativeTotal = state.reviews.filter((review) => review.tone === "부정").reduce((sum, review) => sum + Number(review.count || 1), 0);
+  const reviewTotal = state.reviews.reduce((sum, review) => sum + Number(review.count || 1), 0);
+  $("#gapScore").textContent = Math.round(averageGap);
+  $("#negativeRate").textContent = `${reviewTotal ? Math.round(negativeTotal / reviewTotal * 100) : 0}%`;
+  $("#oldAverageGap").textContent = `-${Math.round(averageGap)}%`;
+}
+
+function strongestMetric() {
+  return [...state.metrics].sort((a, b) => gapRate(b.oldValue, b.compareValue) - gapRate(a.oldValue, a.compareValue))[0];
+}
+
+function updateBrief() {
+  const metric = strongestMetric();
+  const negativeCount = state.reviews.filter((review) => review.tone === "부정").reduce((sum, review) => sum + Number(review.count || 1), 0);
+  const topReviews = state.reviews.filter((review) => review.tone === "부정").slice(0, 3);
+  const compareSummary = state.compares.filter((row) => row.result.includes("격차") || row.result.includes("큼")).slice(0, 2);
+
+  const problem = metric
+    ? `세종시 구도심은 ${metric.category} 분야에서 신도심 또는 목표 기준 대비 격차가 나타나며, 후기조사에서도 이동·문화·생활권 불편이 반복된다.`
+    : "정량 지표를 입력하면 정책 문제 문장이 생성됩니다.";
+  const evidence = [
+    `부정 후기 ${negativeCount}건, 반복 키워드 ${$("#keywordChips").innerText || "미도출"}`,
+    metric ? `대표 정량 지표: ${metric.name}, 구도심 ${metric.oldValue}${metric.unit}, 비교 ${metric.compareValue}${metric.unit}, 격차 ${gapRate(metric.oldValue, metric.compareValue).toFixed(1)}% (${metric.source})` : "대표 정량 지표 미입력",
+    ...topReviews.map((review) => `후기: ${review.place} - ${review.text} (${review.count}회)`)
+  ].join("\n");
+  const cause = compareSummary.length
+    ? compareSummary.map((row) => `${row.item}: ${row.old} / ${row.memo}`).join("\n")
+    : "시설 공급 부족, 배차·환승 불편, 생활권별 수요 불일치 중 어느 원인이 큰지 추가 확인이 필요하다.";
+  const opportunity = "구도심 생활권 문화공간, 야간·주말 프로그램, 신도심-구도심 연계 교통, 상권 체류 콘텐츠를 묶은 생활권 단위 정책 패키지를 검토한다.";
+
+  $("#problemText").value = problem;
+  $("#evidenceText").value = evidence;
+  $("#causeText").value = cause;
+  $("#opportunityText").value = opportunity;
+  $("#briefPreview").textContent = `[정책 문제]\n${problem}\n\n[정량 근거]\n${evidence}\n\n[원인 가설]\n${cause}\n\n[정책 기회]\n${opportunity}`;
+}
+
+function exportJson() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
+  downloadBlob(blob, "sejong-gap-workbench.json");
+}
+
+function exportCsv() {
+  const header = ["지표", "분야", "구도심 값", "비교 값", "단위", "출처", "격차율"];
+  const lines = state.metrics.map((metric) => [metric.name, metric.category, metric.oldValue, metric.compareValue, metric.unit, metric.source, gapRate(metric.oldValue, metric.compareValue).toFixed(1)]
+    .map((value) => `"${String(value).replaceAll('"', '""')}"`).join(","));
+  const blob = new Blob(["\ufeff" + [header.join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+  downloadBlob(blob, "sejong-gap-metrics.csv");
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyBrief() {
+  updateBrief();
+  navigator.clipboard.writeText($("#briefPreview").textContent);
+  $("#copyBrief").textContent = "복사 완료";
+  setTimeout(() => {
+    $("#copyBrief").textContent = "브리프 복사";
+  }, 1200);
+}
+
+function loadDemo() {
+  state.reviews = [
+    { channel: "현장 인터뷰", place: "조치원읍", tone: "부정", text: "버스 배차가 길고 야간 이동이 어렵다", count: 4, url: "" },
+    { channel: "지역 커뮤니티", place: "읍면 지역", tone: "부정", text: "주말에 갈 문화공간과 가족 체류 공간이 부족하다", count: 3, url: "" },
+    { channel: "지도/블로그 후기", place: "행복도시", tone: "긍정", text: "공원과 체육시설은 좋지만 구도심으로 이동하기 불편하다", count: 2, url: "" }
+  ];
+  state.metrics = [
+    { name: "인구 1만 명당 문화시설 수", category: "문화", oldValue: 1.8, compareValue: 3.4, unit: "개/1만명", source: "문화포털·세종시" },
+    { name: "대중교통 접근성 점수", category: "교통", oldValue: 52, compareValue: 78, unit: "점", source: "KTDB·버스정보" },
+    { name: "생활밀착 점포 수", category: "상권", oldValue: 84, compareValue: 112, unit: "개/1만명", source: "상가업소정보" }
+  ];
+  renderAll();
+}
+
+function renderAll() {
+  renderReviews();
+  renderCompare();
+  renderMetrics();
+  updateBrief();
+}
+
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (target.matches(".nav-item")) switchView(target.dataset.view);
+  if (target.matches("[data-delete-review]")) {
+    state.reviews.splice(Number(target.dataset.deleteReview), 1);
+    renderAll();
+  }
+  if (target.matches("[data-delete-metric]")) {
+    state.metrics.splice(Number(target.dataset.deleteMetric), 1);
+    renderAll();
+  }
+});
+
+document.addEventListener("input", (event) => {
+  const target = event.target;
+  if (target.dataset.metric) {
+    const row = state.metrics[Number(target.dataset.metric)];
+    row[target.dataset.field] = target.type === "number" ? Number(target.value) : target.value;
+    updateStats();
+    updateBrief();
+  }
+  if (target.dataset.compare) {
+    state.compares[Number(target.dataset.compare)][target.dataset.field] = target.value;
+    updateBrief();
+  }
+});
+
+$("#addReview").addEventListener("click", addReview);
+$("#resetReviews").addEventListener("click", () => {
+  state.reviews = [];
+  renderAll();
+});
+$("#addCompare").addEventListener("click", () => {
+  state.compares.push({ item: "새 비교 항목", old: "", target: "", result: "", memo: "" });
+  renderAll();
+});
+$("#addMetric").addEventListener("click", () => {
+  state.metrics.push({ name: "새 지표", category: "생활", oldValue: 0, compareValue: 0, unit: "", source: "" });
+  renderAll();
+});
+$("#copyBrief").addEventListener("click", copyBrief);
+$("#exportJson").addEventListener("click", exportJson);
+$("#exportCsv").addEventListener("click", exportCsv);
+$("#loadDemo").addEventListener("click", loadDemo);
+
+renderAll();
+
+</script>
+</body>
+</html>
+
